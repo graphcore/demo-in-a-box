@@ -1,0 +1,24 @@
+FROM graphcore/pytorch
+
+RUN apt-get update -y
+RUN apt-get upgrade -y
+RUN apt-get install git -y
+
+RUN pip3 install notebook
+RUN pip3 install matplotlib scikit-learn pandas statsmodels scipy pillow
+
+ADD jupyter_notebook_config.py /jupyter-config.py
+
+ENV IPUOF_CONFIG_PATH=/etc/ipuof.conf.d/partition.conf
+RUN mkdir /hosted_shared_dir && \
+	cd /hosted_shared_dir && \
+  	git clone https://github.com/graphcore/tutorials.git
+
+RUN cd tutorials/tutorials/pytorch/tut_finetuning_bert/ && \
+	pip3 install -r requirements.txt
+
+#Tutorial Workspace
+WORKDIR /hosted_shared_dir
+
+CMD IPUOF_LOG_LEVEL=DEBUG jupyter-notebook --allow-root --ip=0.0.0.0 --port=44300 --no-browser --config=/jupyter-config.py
+
