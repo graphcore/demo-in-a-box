@@ -1,0 +1,158 @@
+#!/bin/bash
+# Copyright (c) 2021 Graphcore Ltd. All rights reserved.
+
+Help()
+{
+   echo 'run-docker <partition-name> <DockerFile-directory> \
+   [-f=[tf1,tf2,pytorch]]\
+   [-p=<Port number>]
+
+Launches a jupyter server in docker container making Graphcore IPUs available.
+
+[Positional Arguments]
+      1: The name of the V-IPU partition to use for the jupyter server.
+         (run `vipu list partition` to see available partitions)
+      2: Directory with the docker definition
+
+[Optional Arguments]
+      tf1
+            Short-hand for --framework=tf1 use this to run a server with
+            TensorFlow 1 for the IPU available.
+
+      tf2
+            Short-hand for --framework=tf2 use this to run a server with
+            TensorFlow 2 for the IPU available.
+
+      pytorch
+            Short-hand for --framework=pytorch use this to run a server with
+            PyTorch for the IPU available.
+
+      -f=,--framework=[tf1,tf2,pytorch or <string>]
+            One of "tf1", "tf2" or "pytorch" this is used to select the base
+            docker image for the jupyter notebook server. If the string is not
+            matched it is assumed to be the full name of a graphcore docker
+            image.
+
+      -p=,--port=
+            The network port on which to start the jupyter notebook server. To
+            connect to the server you will need to forward this port from your
+            local machine to the machine which hosts the IPUs.
+
+'
+}
+
+# Get the options
+while getopts ":h" option; do
+   case $option in
+      h) # display Help
+         Help
+         exit;;
+   esac
+done
+# Parse required positional arguments
+VIPU_PARTITION=$1
+DOCKER_DIRECTORY=$2
+shift 2
+FRAMEWORK="tf2"
+PORT=44300
+POPLAR_VERSION=2.3.0
+
+for i in "$@"; do
+  case $i in
+    --framework=*|-f=*)
+      FRAMEWORK="${i#*=}"
+      ;;
+    pytorch)
+      FRAMEWORK="pytorch"
+      ;;
+    tf2)
+      FRAMEWORK="tf2"
+      ;;
+    tf1)
+      FRAMEWORK="tf1"
+      ;;
+    --port=*|-p=*)
+      PORT="${i#*=}"
+      ;;
+    *)
+      # unknown option
+      echo "${i} is an unknown option"
+      ;;
+  esac
+done
+
+MOUNTED_DIRECTORY="${PWD}/host_shared_dir"
+DOCKER_IMAGE_BASENAME="autogen-docker-image"
+
+# create a directory to store your partition files if one does not already exist
+conf_dir=${PWD}/.ipuof.conf.d
+if [ ! -d $conf_dir ]; then
+  mkdir -p $conf_dir;
+fi
+
+conf_path=$conf_dir/partition.conf
+
+# generate a new configuration file from the partition name
+vipu get partition ${VIPU_PARTITION} --gcd 0 --ipuof-configs > $conf_path
+
+# export that config to path
+export IPUOF_CONFIG_PATH=$conf_path
+
+# determine CPU architecture to get the correct image
+IS_AMD=`lscpu | grep Vendor | grep -i amd`
+IS_INTEL=`lscpu | grep Vendor | grep -i intel`
+CPU_ARCH="amd"
+if [[ -z "$IS_AMD"  && -z "$IS_INTEL" ]]
+then
+      echo "CPU architecture could not be detected using default"
+elif [[ "$IS_AMD" ]]
+then
+      CPU_ARCH="amd"
+elif [[ "$IS_INTEL" ]]
+then
+      CPU_ARCH="intel"
+fi
+echo "CPU architecture detected is: ${CPU_ARCH}"
+
+# Determine what image to use based on the framework and the CPU
+# architecture
+DOCKER_FRAMEWORK_NAME=""
+if [[ "${FRAMEWORK}" == "tf2" ]]; then
+   DOCKER_BASEIMAGE_NAME="tensorflow:2-${CPU_ARCH}-${POPLAR_VERSION}"
+elif [[ "${FRAMEWORK}" == "tf1" ]]; then
+   DOCKER_BASEIMAGE_NAME="tensorflow:1-${CPU_ARCH}-${POPLAR_VERSION}"
+elif [[ "${FRAMEWORK}" == "pytorch" ]]; then
+   # The cpu architecture is not in the tag of the pytorch images
+   DOCKER_BASEIMAGE_NAME="pytorch:${POPLAR_VERSION}"
+else
+   echo "Framework ${FRAMEWORK} does not match [tf1, tf2, pytorch] using directly as docker"
+   echo "Image name. If you encounter errors check that the name corresponds to a valid image"
+   echo " on https://hub.docker.com/u/graphcore."
+   DOCKER_BASEIMAGE_NAME="${FRAMEWORK}"
+fi
+
+# build the docker image from the Dockerfile
+DOCKER_IMAGE=${DOCKER_IMAGE_BASENAME}-${CPU_ARCH}-${FRAMEWORK}
+
+docker build -t ${DOCKER_IMAGE} \
+   --build-arg DOCKER_BASEIMAGE_NAME=${DOCKER_BASEIMAGE_NAME} \
+   ${DOCKER_DIRECTORY}
+
+mkdir -p ${MOUNTED_DIRECTORY}
+if [ ! -d $MOUNTED_DIRECTORY/tutorials ]; then
+   echo "Cloning tutorials into the mounted directory"
+  git clone https://github.com/graphcore/tutorials ${MOUNTED_DIRECTORY}/tutorials;
+fi
+
+
+# launch the container
+docker run -it --rm \
+ --net=host \
+ --ulimit memlock=-1:-1 \
+ --cap-add=IPC_LOCK \
+ --device=/dev/infiniband/ \
+ --ipc=host \
+ -v $conf_dir:/etc/ipuof.conf.d/ \
+ -v ${PWD}/host_shared_dir:/host_shared_dir \
+ ${DOCKER_IMAGE} \
+ --port=${PORT}
