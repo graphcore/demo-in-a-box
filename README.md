@@ -30,3 +30,12 @@ The simplest ways to use the IPUs for your first application and to complete our
 tutorials is using Jupyter. To help you get setup quickly we have put together
 scripts and Docker files in the [jupyter-docker](jupyter-docker/README.md) folder.
 
+### Trying out IPUs from Spell.ML
+
+You can sign-up in [Spell.ml](https://spell.ml/graphcore) to get access to IPUs and run the tutorials below.
+
+|Tutorial|Description|Spell.ml Link|
+| ------- | ------- |------- | 
+|[Pytorch Tutorials](https://github.com/graphcore/tutorials/tree/master/tutorials/pytorch)|Run Tensorflow Tutorials with the Latest Poplar SDK in Spell Workspace| <a href="https%3A%2F%2Fweb.spell.ml%2Fworkspace_create%3FworkspaceName%3Dgraphcore-pytorch-tutorial%26machineType%26githubUrl%3Dhttps%3A%2F%2Fgithub.com%2Fgraphcore%2Ftutorials.git%26apt%3Dgit%26dockerImage%3Dgraphcore%2Fpytorch-jupyter%3Alatest"><img src=https://spell.ml/badge.svg height=20px/></a>|
+|[Tensorflow 1 Tutorials](https://github.com/graphcore/tutorials/tree/master/tutorials/tensorflow1)|Run Tensorflow 1 Tutorials with the Latest Poplar SDK in Spell Workspace| <a href="https%3A%2F%2Fweb.spell.ml%2Fworkspace_create%3FworkspaceName%3Dgraphcore-tensorflow2-tutorial%26machineType%26githubUrl%3Dhttps%3A%2F%2Fgithub.com%2Fgraphcore%2Ftutorials.git%26apt%3Dgit%26dockerImage%3Dgraphcore%2Ftensorflow-jupyter%3Alatest"><img src=https://spell.ml/badge.svg height=20px/></a>|
+|[Tensorflow 2 Tutorials](https://github.com/graphcore/tutorials/tree/master/tutorials/tensorflow2)|Run Tensorflow 2 Tutorials with the Latest Poplar SDK in Spell Workspace| <a href="https%3A%2F%2Fweb.spell.ml%2Fworkspace_create%3FworkspaceName%3Dgraphcore-tensorflow2-tutorial%26machineType%26githubUrl%3Dhttps%3A%2F%2Fgithub.com%2Fgraphcore%2Ftutorials.git%26apt%3Dgit%26dockerImage%3Dgraphcore%2Ftensorflow-jupyter%3Alatest"><img src=https://spell.ml/badge.svg height=20px/></a>|
