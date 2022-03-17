@@ -1,0 +1,7 @@
+jupyter
+jedi==0.17.2
+tqdm
+transformers==4.10.2
+datasets
+huggingface-hub
+ipywidgets
