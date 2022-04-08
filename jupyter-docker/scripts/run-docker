@@ -38,6 +38,15 @@ Launches a jupyter server in docker container making Graphcore IPUs available.
             connect to the server you will need to forward this port from your
             local machine to the machine which hosts the IPUs.
 
+      --poplar=
+            The poplar version to use. If not specified, the latest available
+            version will be used.
+
+      --use-base-image
+            Use the standard images, jupyter will be installed into the image
+            as it is built. (Uses the graphcore/<framework> instead of the
+            `graphcore/<framework>-jupyter` image).
+
 '
 }
 
@@ -55,7 +64,8 @@ DOCKER_DIRECTORY=$2
 shift 2
 FRAMEWORK="tf2"
 PORT=44300
-POPLAR_VERSION=2.3.0
+POPLAR_VERSION="2.4.0"
+USE_JUPYTER_IMAGE="-jupyter"
 
 for i in "$@"; do
   case $i in
@@ -73,6 +83,12 @@ for i in "$@"; do
       ;;
     --port=*|-p=*)
       PORT="${i#*=}"
+      ;;
+    --poplar=*)
+      POPLAR_VERSION="${i#*=}"
+      ;;
+    --use-base-image)
+      USE_JUPYTER_IMAGE=""
       ;;
     *)
       # unknown option
@@ -118,12 +134,18 @@ echo "CPU architecture detected is: ${CPU_ARCH}"
 # architecture
 DOCKER_FRAMEWORK_NAME=""
 if [[ "${FRAMEWORK}" == "tf2" ]]; then
-   DOCKER_BASEIMAGE_NAME="tensorflow:2-${CPU_ARCH}-${POPLAR_VERSION}"
+   DOCKER_BASEIMAGE_NAME="tensorflow${USE_JUPYTER_IMAGE}:2-${CPU_ARCH}"
+   if [[ "${POPLAR_VERSION}" != "latest" ]]; then
+      DOCKER_BASEIMAGE_NAME+="-${POPLAR_VERSION}"
+   fi
 elif [[ "${FRAMEWORK}" == "tf1" ]]; then
-   DOCKER_BASEIMAGE_NAME="tensorflow:1-${CPU_ARCH}-${POPLAR_VERSION}"
+   DOCKER_BASEIMAGE_NAME="tensorflow${USE_JUPYTER_IMAGE}:1-${CPU_ARCH}"
+   if [[ "${POPLAR_VERSION}" != "latest" ]]; then
+      DOCKER_BASEIMAGE_NAME+="-${POPLAR_VERSION}"
+   fi
 elif [[ "${FRAMEWORK}" == "pytorch" ]]; then
    # The cpu architecture is not in the tag of the pytorch images
-   DOCKER_BASEIMAGE_NAME="pytorch:${POPLAR_VERSION}"
+   DOCKER_BASEIMAGE_NAME="pytorch${USE_JUPYTER_IMAGE}:${POPLAR_VERSION}"
 else
    echo "Framework ${FRAMEWORK} does not match [tf1, tf2, pytorch] using directly as docker"
    echo "Image name. If you encounter errors check that the name corresponds to a valid image"
@@ -132,7 +154,7 @@ else
 fi
 
 # build the docker image from the Dockerfile
-DOCKER_IMAGE=${DOCKER_IMAGE_BASENAME}-${CPU_ARCH}-${FRAMEWORK}
+DOCKER_IMAGE=${DOCKER_IMAGE_BASENAME}-${CPU_ARCH}-${FRAMEWORK}:${POPLAR_VERSION}
 
 docker build -t ${DOCKER_IMAGE} \
    --build-arg DOCKER_BASEIMAGE_NAME=${DOCKER_BASEIMAGE_NAME} \
