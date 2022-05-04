@@ -11,9 +11,9 @@ running your first application on the IPU using Jupyter notebooks.
 
 ## Quick start: Run on Spell
 
-Make sure you sign-up in [Spell.ml](https://spell.ml/graphcore) to get access to IPUs and run the tutorials below.
+Run the [GroupBERT code](https://github.com/graphcore/examples/tree/master/applications/tensorflow/bert#readme) in IPUs through [Spell.ml](https://spell.ml/graphcore).
 
-<a href="https://web.spell.ml/workspace_create?workspaceName=Graphcore-BERT-Finetuning-demo&machineType=IPUx16&githubUrl=https%3A%2F%2Fgithub.com%2Fgraphcore%2Fdemo-in-a-box&apt=git-lfs&pip=huggingface-hub&isLab=False&dockerImage=graphcore%2Fpytorch-jupyter%3Alatest"><img src=https://spell.ml/badge.svg height=20px/></a>
+ <a href="https://web.spell.ml/workspace_create?workspaceName=Graphcore-BERT-Finetuning-demo&machineType=IPUx16&githubUrl=https%3A%2F%2Fgithub.com%2Fgraphcore%2Fdemo-in-a-box&apt=git-lfs&pip=huggingface-hub&isLab=false&dockerImage=graphcore%2Fpytorch-jupyter%3Alatest"><img src=https://spell.ml/badge.svg height=20px/></a>
 
 
 ## Quick start: On Graphcloud
