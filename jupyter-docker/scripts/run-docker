@@ -64,7 +64,7 @@ DOCKER_DIRECTORY=$2
 shift 2
 FRAMEWORK="tf2"
 PORT=44300
-POPLAR_VERSION="2.4.0"
+POPLAR_VERSION="latest"
 USE_JUPYTER_IMAGE="-jupyter"
 
 for i in "$@"; do
