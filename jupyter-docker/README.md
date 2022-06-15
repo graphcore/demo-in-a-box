@@ -9,12 +9,6 @@ running your first application on the IPU using Jupyter notebooks.
 | Docker       | `sudo apt-get install docker`            |
 | V-IPU        | pre-installed on IPU-PODs and Graphcloud |
 
-## Quick start: Run on Spell
-
-Run the [GroupBERT code](https://github.com/graphcore/examples/tree/master/applications/tensorflow/bert#readme) in IPUs through [Spell.ml](https://spell.ml/graphcore).
-
- <a href="https://web.spell.ml/workspace_create?workspaceName=Graphcore-BERT-Finetuning-demo&machineType=IPUx16&githubUrl=https%3A%2F%2Fgithub.com%2Fgraphcore%2Fdemo-in-a-box&apt=git-lfs&pip=huggingface-hub&isLab=false&dockerImage=graphcore%2Fpytorch-jupyter%3Alatest"><img src=https://spell.ml/badge.svg height=20px/></a>
-
 
 ## Quick start: On Graphcloud
 
