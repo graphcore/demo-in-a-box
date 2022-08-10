@@ -10,6 +10,10 @@ running your first application on the IPU using Jupyter notebooks.
 | V-IPU        | pre-installed on IPU-PODs and Graphcloud |
 
 
+## Quick start: On Gradient PyTorch Runtime
+
+[![Gradient](https://assets.paperspace.io/img/gradient-badge.svg)](https://console.paperspace.com/github/gradient-ai/Graphcore-PyTorch?machine=Free-IPU-POD16&container=graphcore%2Fpytorch-jupyter%3A2.6.0-ubuntu-20.04-20220804&file=%2Fget-started%2FFine-tuning-BERT.ipynb)
+
 ## Quick start: On Graphcloud
 
 
