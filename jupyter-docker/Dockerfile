@@ -6,7 +6,6 @@ ARG  DOCKER_BASEIMAGE_NAME
 RUN echo graphcore/${DOCKER_BASEIMAGE_NAME}
 
 RUN apt-get update -y
-RUN apt-get upgrade -y
 
 RUN pip3 install jupyter
 RUN pip3 install matplotlib scikit-learn pandas statsmodels scipy pillow
